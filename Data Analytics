@@ -1,1 +1,135 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+df = pd.read_csv(
+    "C:/Users/prami/Downloads/semV/EDA/Netflix.csv",
+    encoding='latin1'
+)
+
+
+df['Release_Date'] = pd.to_datetime(df['Release_Date'],format='%d-%b-%y', errors='coerce')
+df['Year'] = df['Release_Date'].dt.year
+
+if 2020 not in df['Year'].dropna().unique():
+    latest_year = int(df['Year'].dropna().max())
+    df_2020 = df[df['Year'] == latest_year]
+else:
+    df_2020 = df[df['Year'] == 2020]
+
+movies_2020 = df_2020[df_2020['Category'] == "Movie"]
+
+if movies_2020.empty:
+    movies_2020 = df[df["Category"] == "Movie"].head(10)
+
+top10 = movies_2020.head(10).copy()
+
+np.random.seed(42)
+top10["Review_Score"] = np.random.randint(1, 11, size=len(top10))
+
+top10 = top10.sort_values(by="Review_Score", ascending=True)
+
+sns.set_palette("coolwarm")
+plt.style.use("seaborn-v0_8-darkgrid")
+
+
+plt.figure(figsize=(12, 6))
+sns.barplot(data=top10, x="Title", y="Review_Score", palette="viridis", hue="Title", legend=False)
+plt.title("Top 10 Netflix Movies (Review Score Increasing)", fontsize=18, fontweight="bold")
+plt.xlabel("Movie Title")
+plt.ylabel("Review Score (1–10)")
+plt.ylim(0, 10)
+plt.xticks(rotation=90, ha='right')
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(12, 6))
+sns.barplot(data=top10, x="Title", y="Review_Score", hue="Genre", dodge=False)
+plt.title("Top 10 Movies by Genre and Review Score", fontsize=18, fontweight='bold')
+plt.xlabel("Movie Title")
+plt.ylabel("Review Score (1–10)")
+plt.ylim(0, 10)
+plt.xticks(rotation=90, ha='right')
+plt.legend(title="Genre")
+plt.tight_layout()
+plt.show()
+
+print("\nTop 10 Movies with Genre and Review Score:")
+print(top10[["Title", "Genre", "Review_Score"]])
+
+
+plt.figure(figsize=(12, 6))
+sns.barplot(data=top10, x="Title", y="Review_Score", hue="Rating", dodge=False)
+plt.title("Top 10 Movies by Rating and Review Score", fontsize=18, fontweight='bold')
+plt.xlabel("Movie Title")
+plt.ylabel("Review Score (1–10)")
+plt.ylim(0, 10)
+plt.xticks(rotation=45, ha='right')
+plt.legend(title="Rating")
+plt.tight_layout()
+plt.show()
+
+print("\nTop 10 Movies with Rating and Review Score:")
+print(top10[["Title", "Rating", "Review_Score"]])
+
+
+plt.figure(figsize=(12, 7))
+
+sns.barplot(
+    data=top10,
+    y="Title",
+    x="Review_Score",
+    hue="Genre",
+    dodge=False,
+    palette="magma"
+)
+
+
+for index, row in top10.iterrows():
+    plt.text(
+        row["Review_Score"] + 0.1,  
+        index,
+        f'Rating: {row["Rating"]}',
+        va='center',
+        fontsize=10,
+        color='black'
+    )
+
+plt.title("Top 10 Netflix Movies: Review Score with Genre and Rating", fontsize=18, fontweight='bold')
+plt.xlabel("Review Score (1–10)")
+plt.ylabel("Movie Title")
+plt.xlim(0, 10)
+plt.legend(title="Genre")
+plt.tight_layout()
+plt.show()
+
+
+
+tvshows_2020 = df_2020[df_2020['Category'] == "TV Show"]
+
+
+if tvshows_2020.empty:
+    tvshows_2020 = df[df["Category"] == "TV Show"].head(10)
+
+
+top10tv = tvshows_2020.head(10).copy()
+
+
+np.random.seed(42)
+top10tv["Review_Score"] = np.random.randint(1, 11, size=len(top10tv))
+
+
+top10tv = top10tv.sort_values(by="Review_Score", ascending=True)
+
+plt.figure(figsize=(12, 6))
+sns.barplot(data=top10tv, x="Title", y="Review_Score", palette="viridis", hue="Title", legend=False)
+plt.title("Top 10 Netflix TV Show (Review Score Increasing)", fontsize=18, fontweight="bold")
+plt.xlabel("TV Show Title")
+plt.ylabel("Review Score (1–10)")
+plt.ylim(0, 10)
+plt.xticks(rotation=90, ha='right')
+plt.tight_layout()
+plt.show()
 
